@@ -260,7 +260,15 @@ def __analyzer_action_hash(build_action: CompileAction) -> str:
 
     build_info = source_file + '_' + ' '.join(args)
 
-    return hashlib.md5(build_info.encode(errors='ignore')).hexdigest()
+    try:
+        # 'usedforsecurity=False' allows non-cryptographic MD5 hashing on
+        # FIPS-enforced hosts
+        return hashlib.md5(build_info.encode(errors='ignore'),
+                           usedforsecurity=False).hexdigest()
+    except TypeError:
+        # Fallback for Python < 3.9 where 'usedforsecurity' keyword is
+        # unsupported
+        return hashlib.md5(build_info.encode(errors='ignore')).hexdigest()
 
 
 def __get_ctu_buildactions(

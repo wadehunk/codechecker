@@ -12,12 +12,12 @@ import os
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
-import hashlib
 from typing import Iterable, Optional
 
 from codechecker_report_converter.report import Report, report_file
 from codechecker_report_converter.report.hash import get_report_hash, HashType
 from codechecker_report_converter.report.parser.base import AnalyzerInfo
+from codechecker_report_converter.util import md5_hexdigest
 
 
 LOG = logging.getLogger('report-converter')
@@ -163,8 +163,7 @@ class AnalyzerResultBase(metaclass=ABCMeta):
         analyzer_info = AnalyzerInfo(name=self.TOOL_NAME)
         for file_path, file_reports in file_to_report.items():
             source_file = os.path.basename(file_path)
-            file_hash = hashlib.md5(file_path.encode(errors='ignore')) \
-                .hexdigest()
+            file_hash = md5_hexdigest(file_path.encode(errors='ignore'))
 
             out_file_name = file_name \
                 .replace("{source_file}", source_file) \

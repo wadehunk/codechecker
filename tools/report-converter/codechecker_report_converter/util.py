@@ -12,6 +12,7 @@ import os
 import sys
 import fnmatch
 import re
+import hashlib
 
 from typing import Optional, TextIO
 
@@ -121,3 +122,17 @@ def dump_json_output(
         out.write(f"{data_str}\n")
 
     return data_str
+
+
+def md5_hexdigest(data: bytes) -> str:
+    """
+    Computes MD5 hash with non-cryptographic flag for FIPS compliance.
+    """
+    try:
+        # 'usedforsecurity=False' allows non-cryptographic MD5 hashing on
+        # FIPS-enforced hosts
+        return hashlib.md5(data, usedforsecurity=False).hexdigest()
+    except TypeError:
+        # Fallback for Python < 3.9 where 'usedforsecurity' keyword is
+        # unsupported
+        return hashlib.md5(data).hexdigest()
